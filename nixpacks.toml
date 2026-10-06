@@ -1,0 +1,6 @@
+# Railway uses Nixpacks to build. This ensures Python is detected.
+[phases.setup]
+nixPkgs = ["python311"]
+
+[start]
+cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
