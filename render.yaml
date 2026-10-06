@@ -1,0 +1,19 @@
+# Render Deployment Blueprint Configuration
+# Online Shopping System - Admin Dashboard
+
+services:
+  - type: web
+    name: online-shopping-system
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: DB_TYPE
+        value: sqlite
+      - key: DB_FILE
+        value: shopping_system.db
+      - key: PYTHON_VERSION
+        value: 3.11.9
+    healthCheckPath: /api/stats
