@@ -4,9 +4,12 @@ Handles KPI stat cards and Chart.js endpoints.
 """
 
 from flask import Blueprint, jsonify
-from db import get_db, rows_to_dict_list, translate_oracle_error
+from db import get_db, rows_to_dict_list, translate_oracle_error, DB_TYPE
 
 dashboard_bp = Blueprint("dashboard", __name__)
+
+# SQLite does not support FETCH FIRST; use LIMIT there.
+TOP_5_CLAUSE = "FETCH FIRST 5 ROWS ONLY" if DB_TYPE == "oracle" else "LIMIT 5"
 
 @dashboard_bp.route("/stats", methods=["GET"])
 def get_stats():
@@ -28,7 +31,7 @@ def get_stats():
             cursor.execute("SELECT COUNT(*) FROM Orders")
             total_orders = cursor.fetchone()[0]
 
-            cursor.execute("SELECT NVL(SUM(quantity * unit_price), 0) FROM Order_Item")
+            cursor.execute("SELECT COALESCE(SUM(quantity * unit_price), 0) FROM Order_Item")
             total_revenue = float(cursor.fetchone()[0] or 0)
 
             cursor.execute("SELECT COUNT(*) FROM Payment WHERE payment_status = 'Pending'")
@@ -51,7 +54,7 @@ def get_revenue_by_category():
     Returns total revenue grouped by product category for Doughnut Chart.
     """
     sql = """
-        SELECT c.category_name, NVL(SUM(oi.quantity * oi.unit_price), 0) AS revenue
+        SELECT c.category_name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue
         FROM Category c
         LEFT JOIN Product p ON c.category_id = p.category_id
         LEFT JOIN Order_Item oi ON p.product_id = oi.product_id
@@ -72,15 +75,15 @@ def get_revenue_by_category():
 def get_top_products():
     """
     Returns top 5 products ranked by total unit quantity sold for Horizontal Bar Chart.
-    Uses Oracle 23ai 'FETCH FIRST 5 ROWS ONLY'.
+    Uses 'FETCH FIRST 5 ROWS ONLY' on Oracle and 'LIMIT 5' on SQLite.
     """
-    sql = """
-        SELECT p.product_name, NVL(SUM(oi.quantity), 0) AS total_sold
+    sql = f"""
+        SELECT p.product_name, COALESCE(SUM(oi.quantity), 0) AS total_sold
         FROM Product p
         JOIN Order_Item oi ON p.product_id = oi.product_id
         GROUP BY p.product_id, p.product_name
         ORDER BY total_sold DESC
-        FETCH FIRST 5 ROWS ONLY
+        {TOP_5_CLAUSE}
     """
     try:
         with get_db() as conn:
@@ -118,14 +121,14 @@ def get_customer_spending():
     """
     Returns top spending customers for Bar Chart analysis.
     """
-    sql = """
-        SELECT c.name, NVL(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
+    sql = f"""
+        SELECT c.name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS total_spent
         FROM Customer c
         JOIN Orders o ON c.customer_id = o.customer_id
         JOIN Order_Item oi ON o.order_id = oi.order_id
         GROUP BY c.customer_id, c.name
         ORDER BY total_spent DESC
-        FETCH FIRST 5 ROWS ONLY
+        {TOP_5_CLAUSE}
     """
     try:
         with get_db() as conn:
