@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Shopping System - Admin Dashboard</title>
+  <meta name="description" content="Modern responsive admin dashboard and Oracle 23ai Flask REST API for an Online Shopping System with real-time stats, order transactions, inventory tracking, and payment management." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js from cdnjs CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleMobileSidebar(false)"></div>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">ShopAdmin</div>
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Oracle 23ai DBMS</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="products" onclick="switchView('products')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span>Products</span>
+        </a>
+        <a class="nav-item" data-view="customers" onclick="switchView('customers')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Customers</span>
+        </a>
+        <a class="nav-item" data-view="orders" onclick="switchView('orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a class="nav-item" data-view="place-order" onclick="switchView('place-order')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <span>Place New Order</span>
+        </a>
+        <a class="nav-item" data-view="payments" onclick="switchView('payments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          <span>Payment Records</span>
+        </a>
+
+        <div style="margin: 14px 12px 6px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">
+          Customer Portal
+        </div>
+        <a class="nav-item" data-view="user-dashboard" onclick="switchView('user-dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>User Dashboard</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">DBMS College Project</div>
+        <div>Flask + Oracle 23ai API</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMobileSidebar()" aria-label="Toggle Sidebar Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 class="page-title" id="pageTitle">Dashboard Overview</h1>
+        </div>
+
+        <div class="header-right">
+          <!-- User Login / Profile Header Button -->
+          <button class="user-profile-header-btn" onclick="openLoginModal()" title="Active user session - Click to switch user or log in">
+            <span class="user-mini-avatar" id="headerUserAvatar">MA</span>
+            <span class="user-header-name" id="headerUserName">Abhishek</span>
+            <span class="badge-role-tag" id="headerUserRole">Admin</span>
+          </button>
+          <div class="db-badge">Oracle 23ai Connected</div>
+          <!-- Dark Mode Toggle Button with LocalStorage Persistence -->
+          <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleDarkMode()" aria-label="Toggle dark/light theme">
+            <span id="themeIcon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </span>
+            <span id="themeText">Dark Mode</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Body Viewport -->
+      <main class="content-viewport">
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section active">
+          <!-- User Session & Quick Login Bar -->
+          <div class="user-session-bar">
+            <div class="user-session-info">
+              <div class="user-avatar-circle" id="userAvatarText">MA</div>
+              <div>
+                <div class="user-session-name">
+                  <span id="currentUserNameDisplay">Manepalli Abhishek</span>
+                  <span class="user-role-badge" id="currentUserRoleDisplay">Admin (25B11CS561)</span>
+                  <span class="session-active-pill">● Online</span>
+                </div>
+                <div class="user-session-meta">
+                  <span id="sessionLoginTimeText">Session started: Active</span>
+                  <span class="separator-dot">•</span>
+                  <span>Oracle 23ai Engine Connected</span>
+                </div>
+              </div>
+            </div>
+            <div class="user-session-actions">
+              <button class="btn btn-secondary btn-sm" onclick="openLoginModal()" title="Switch user profile or re-authenticate">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Switch User / Log In</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="switchView('place-order')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Place Order</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Clickable Stat Cards (Direct Navigation to Customers, Products, Orders, Revenue/Payments) -->
+          <div class="stats-grid">
+            <div class="stat-card clickable-card" onclick="switchView('customers')" role="button" tabindex="0" title="Click to view Customer Directory">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Customers</span>
+                <div class="stat-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="statCustomers">-</div>
+              <div class="stat-footnote">Active registered shoppers</div>
+              <div class="stat-card-footer">
+                <span>View Customers List</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+
+            <div class="stat-card clickable-card" onclick="switchView('products')" role="button" tabindex="0" title="Click to view Products Catalog">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Products</span>
+                <div class="stat-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="statProducts">-</div>
+              <div class="stat-footnote">Inventory catalog items</div>
+              <div class="stat-card-footer">
+                <span>View Products Catalog</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+
+            <div class="stat-card clickable-card" onclick="switchView('orders')" role="button" tabindex="0" title="Click to view All Orders">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Orders</span>
+                <div class="stat-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="statOrders">-</div>
+              <div class="stat-footnote" id="pendingPaymentsContainer">
+                <span class="stat-badge badge-pending" id="statPendingPayments">0 Pending Payments</span>
+              </div>
+              <div class="stat-card-footer">
+                <span>View All Orders</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+
+            <div class="stat-card clickable-card" onclick="switchView('payments')" role="button" tabindex="0" title="Click to view Payments & Revenue Ledger">
+              <div class="stat-card-header">
+                <span class="stat-label">Total Revenue</span>
+                <div class="stat-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+              </div>
+              <div class="stat-value tabular-nums" id="statRevenue">-</div>
+              <div class="stat-footnote">Calculated from order items</div>
+              <div class="stat-card-footer">
+                <span>View Payments & Ledger</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid (4 Charts from CDN Chart.js) -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Revenue by Category</h3>
+                <span style="font-size: 12px; color: var(--text-muted);">Doughnut Analysis</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chartRevenueCategory"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Top 5 Products</h3>
+                <span style="font-size: 12px; color: var(--text-muted);">Units Sold</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chartTopProducts"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Orders by Status</h3>
+                <span style="font-size: 12px; color: var(--text-muted);">Fulfillment Ratio</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chartOrderStatus"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Customer Spending</h3>
+                <span style="font-size: 12px; color: var(--text-muted);">Top Spenders</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="chartCustomerSpending"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders Table -->
+          <div class="content-card">
+            <div class="card-header-bar">
+              <h3 class="card-header-title">Recent Orders</h3>
+              <button class="btn btn-secondary btn-sm" onclick="switchView('orders')">View All Orders</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th class="text-right">Total (₹)</th>
+                    <th>Payment</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="recentOrdersTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center" style="padding: 28px;">
+                      <div class="spinner"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- User & System Activity Log on Dashboard -->
+          <div class="content-card" style="margin-top: 24px;" id="dashboardUserLogCard">
+            <div class="card-header-bar">
+              <div>
+                <h3 class="card-header-title" style="display: flex; align-items: center; gap: 8px;">
+                  <span>User & System Activity Log</span>
+                  <span class="badge-pill-outline">Live Audit Trail</span>
+                </h3>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                  Real-time audit log tracking administrator logins, ACID order placements, payment settlements, and catalog operations
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <select id="userLogFilter" class="select-control" style="font-size: 12px; padding: 6px 10px;" onchange="renderUserActivityLogs()">
+                  <option value="ALL">All Events</option>
+                  <option value="LOGIN">User Logins</option>
+                  <option value="ORDER">Orders Placed</option>
+                  <option value="STATUS">Status Updates</option>
+                  <option value="PAYMENT">Payments</option>
+                  <option value="PRODUCT">Inventory</option>
+                  <option value="CUSTOMER">Customers</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="clearUserLogs()" title="Clear activity log history">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Clear Log</span>
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px;">Timestamp</th>
+                    <th style="width: 220px;">User / Operator</th>
+                    <th style="width: 130px;">Action</th>
+                    <th>Activity Details</th>
+                    <th style="width: 100px;" class="text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="userActivityLogTableBody">
+                  <!-- Dynamically populated by app.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. PRODUCTS VIEW -->
+        <section id="view-products" class="view-section">
+          <div class="content-card">
+            <div class="card-header-bar">
+              <div class="card-actions">
+                <div class="search-input-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="productSearchInput" class="input-text" placeholder="Search products..." oninput="handleProductFilter()" />
+                </div>
+                <select id="productCategoryFilter" class="select-control" onchange="handleProductFilter()">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn btn-secondary" onclick="exportProductsCSV()" title="Export current products to CSV">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Export CSV</span>
+                </button>
+                <button class="btn btn-primary" onclick="openProductModal()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Add Product</span>
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th class="text-right">Price</th>
+                    <th class="text-right">Stock Qty</th>
+                    <th>Inventory Status</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center" style="padding: 28px;"><div class="spinner"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. CUSTOMERS VIEW -->
+        <section id="view-customers" class="view-section">
+          <div class="content-card">
+            <div class="card-header-bar">
+              <div class="card-actions">
+                <div class="search-input-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="customerSearchInput" class="input-text" placeholder="Search customers..." oninput="handleCustomerFilter()" />
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="openCustomerModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Customer</span>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Customer Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center" style="padding: 28px;"><div class="spinner"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. ORDERS VIEW -->
+        <section id="view-orders" class="view-section">
+          <div class="content-card">
+            <div class="card-header-bar">
+              <div class="card-actions">
+                <label style="font-size: 13px; font-weight: 500; color: var(--text-secondary);">Filter Status:</label>
+                <select id="orderStatusFilter" class="select-control" onchange="loadOrders()">
+                  <option value="">All Orders</option>
+                  <option value="Placed">Placed</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="btn btn-secondary" onclick="exportOrdersCSV()" title="Export current orders to CSV">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Export CSV</span>
+                </button>
+                <button class="btn btn-primary" onclick="switchView('place-order')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>New Order</span>
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Order Status</th>
+                    <th class="text-right">Order Total</th>
+                    <th>Payment Status</th>
+                    <th class="text-center">Quick Action</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center" style="padding: 28px;"><div class="spinner"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. PLACE NEW ORDER VIEW -->
+        <section id="view-place-order" class="view-section">
+          <div class="order-builder-layout">
+            <div class="content-card" style="padding: 24px;">
+              <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 20px;">Place New Order (ACID Transaction)</h2>
+              <form id="placeOrderForm" onsubmit="handlePlaceOrder(event)">
+                <div class="form-group">
+                  <label class="form-label" for="orderCustomerSelect">Select Customer <span class="required">*</span></label>
+                  <select id="orderCustomerSelect" class="form-control" required>
+                    <option value="">-- Choose Customer --</option>
+                  </select>
+                </div>
+
+                <div style="margin-top: 24px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                  <h3 style="font-size: 15px; font-weight: 600;">Order Items</h3>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="addOrderItemRow()">
+                    + Add Product Row
+                  </button>
+                </div>
+
+                <div id="orderItemsContainer">
+                  <!-- Dynamic rows generated here -->
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                  <label class="form-label" for="orderPaymentMethod">Payment Method <span class="required">*</span></label>
+                  <select id="orderPaymentMethod" class="form-control" required>
+                    <option value="UPI">UPI</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="COD">Cash on Delivery (COD)</option>
+                  </select>
+                </div>
+
+                <div style="margin-top: 24px;">
+                  <button type="submit" id="submitOrderBtn" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                    Submit &amp; Execute Transaction
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Order Summary Sidebar Box -->
+            <div class="order-calc-card">
+              <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Order Summary</h3>
+              <div class="calc-line">
+                <span>Selected Items:</span>
+                <span id="summaryItemCount" class="tabular-nums font-semibold">0</span>
+              </div>
+              <div class="calc-line">
+                <span>Total Units:</span>
+                <span id="summaryUnitCount" class="tabular-nums font-semibold">0</span>
+              </div>
+              <div class="calc-line">
+                <span>Subtotal:</span>
+                <span id="summarySubtotal" class="tabular-nums font-semibold">₹0.00</span>
+              </div>
+              <div class="calc-total">
+                <span>Grand Total:</span>
+                <span id="summaryGrandTotal" class="tabular-nums" style="color: var(--primary);">₹0.00</span>
+              </div>
+              <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                <p><strong>ACID Guarantees:</strong> Executed in a single database transaction. Stock quantities are verified and decremented atomically. Failure triggers instant rollback.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. PAYMENTS VIEW (RENAMED TO PAYMENT RECORDS) -->
+        <section id="view-payments" class="view-section">
+          <div class="content-card">
+            <div class="card-header-bar">
+              <h3 class="card-header-title">Payment Records &amp; Settlement</h3>
+              <span style="font-size: 12px; color: var(--text-muted);">1:1 Order Payment Ledger</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Payment ID</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th class="text-right">Amount (₹)</th>
+                    <th>Status</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTableBody">
+                  <tr>
+                    <td colspan="8" class="text-center" style="padding: 28px;"><div class="spinner"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. USER DASHBOARD (SHOPPER PORTAL: PLACING & TRACKING ORDERS) -->
+        <section id="view-user-dashboard" class="view-section">
+          <!-- User Profile & Multi-User Access Management Bar -->
+          <div class="user-portal-header">
+            <div class="user-portal-profile">
+              <div class="user-portal-avatar" id="shopperAvatarBadge">MA</div>
+              <div class="user-portal-details">
+                <div class="user-portal-name-row">
+                  <span class="user-portal-name" id="shopperNameText">Manepalli Abhishek</span>
+                  <span class="badge-role-tag" id="shopperBadgeText">Shopper Account</span>
+                  <span class="multi-user-indicator-badge">● Multi-User Access Active</span>
+                </div>
+                <div class="user-portal-contact" id="shopperContactText">
+                  <span>25B11CS561@college.edu</span> • <span>+91 25B11CS561</span> • <span>Dept of CSE, Block A, Visakhapatnam</span>
+                </div>
+              </div>
+            </div>
+            <div class="multi-user-controls">
+              <div class="user-portal-switch">
+                <select id="shopperProfileSelect" class="select-control" style="width: 100%; font-weight: 600;" onchange="handleShopperChange(this.value)" title="Quick-switch user">
+                  <!-- Dynamically populated from customers -->
+                </select>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openMultiUserSwitchModal()" title="View and switch between all registered users">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Switch User</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="openRegisterShopperModal()" title="Register a new shopper account for multiple users">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>+ Register User</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Shopper Stat Metrics -->
+          <div class="shopper-stats-grid">
+            <div class="shopper-stat-pill">
+              <div class="shopper-stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
+              </div>
+              <div>
+                <div class="shopper-stat-val tabular-nums" id="shopperTotalOrdersVal">0</div>
+                <div class="shopper-stat-lbl">My Total Orders</div>
+              </div>
+            </div>
+
+            <div class="shopper-stat-pill">
+              <div class="shopper-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+              <div>
+                <div class="shopper-stat-val tabular-nums" id="shopperTotalSpentVal">₹0.00</div>
+                <div class="shopper-stat-lbl">Total Spent</div>
+              </div>
+            </div>
+
+            <div class="shopper-stat-pill">
+              <div class="shopper-stat-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <div>
+                <div class="shopper-stat-val tabular-nums" id="shopperActiveOrdersVal">0</div>
+                <div class="shopper-stat-lbl">In-Transit / Placed</div>
+              </div>
+            </div>
+
+            <div class="shopper-stat-pill">
+              <div class="shopper-stat-icon" style="background: rgba(147, 51, 234, 0.1); color: #9333ea;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              </div>
+              <div>
+                <div class="shopper-stat-val tabular-nums" id="shopperPendingPayVal">0</div>
+                <div class="shopper-stat-lbl">Pending Payments</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shopper Navigation Tabs: [Track Orders] & [Place Order] -->
+          <div class="user-portal-tabs">
+            <button class="portal-tab-btn active" id="tabBtnTrackOrders" onclick="switchUserPortalTab('track')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Track My Orders (<span id="userOrdersCountBadge">0</span>)</span>
+            </button>
+            <button class="portal-tab-btn" id="tabBtnPlaceOrder" onclick="switchUserPortalTab('shop')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span>Place New Order (Shop Catalog)</span>
+            </button>
+          </div>
+
+          <!-- SUB-TAB 1: TRACK MY ORDERS WITH VISUAL PROGRESS STEPPER -->
+          <div id="userTabContentTrack" class="portal-tab-content active">
+            <div id="userOrdersListContainer">
+              <div class="loading-container">
+                <div class="spinner"></div>
+                <span>Loading your orders and live tracking status...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 2: SHOPPING & ONE-CLICK ORDER PLACEMENT -->
+          <div id="userTabContentShop" class="portal-tab-content">
+            <div class="shopper-store-layout">
+              <!-- Catalog Section -->
+              <div class="shopper-catalog-section">
+                <div class="shopper-catalog-search-bar">
+                  <div class="search-input-box" style="flex: 1;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="shopperCatalogSearch" class="input-text" placeholder="Search catalog items..." oninput="filterShopperCatalog()" />
+                  </div>
+                  <select id="shopperCatalogCatFilter" class="select-control" onchange="filterShopperCatalog()">
+                    <option value="">All Categories</option>
+                  </select>
+                </div>
+                <div class="shopper-products-grid" id="shopperProductsGrid">
+                  <!-- Product cards dynamically loaded -->
+                </div>
+              </div>
+
+              <!-- Cart & Checkout Sidebar -->
+              <div class="shopper-cart-card">
+                <div class="shopper-cart-header">
+                  <h3 style="font-size: 16px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Shopping Cart</span>
+                  </h3>
+                  <button class="btn btn-secondary btn-sm" onclick="clearShopperCart()">Clear</button>
+                </div>
+
+                <div class="shopper-cart-items" id="shopperCartItemsList">
+                  <div class="empty-cart-msg">Your shopping bag is empty.<br>Select items from catalog to place an order.</div>
+                </div>
+
+                <div class="shopper-cart-footer">
+                  <div class="shopper-cart-summary-line">
+                    <span>Selected Items</span>
+                    <span id="shopperCartCountText" class="tabular-nums font-semibold">0</span>
+                  </div>
+                  <div class="shopper-cart-summary-line total-line">
+                    <span>Order Total</span>
+                    <span id="shopperCartTotalText" class="tabular-nums" style="color: var(--primary);">₹0.00</span>
+                  </div>
+
+                  <div style="margin-top: 14px;">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Select Payment Method</label>
+                    <select id="shopperPaymentMethod" class="select-control" style="width: 100%;">
+                      <option value="UPI">UPI (Google Pay, PhonePe, Paytm)</option>
+                      <option value="Credit Card">Credit / Debit Card</option>
+                      <option value="COD">Cash on Delivery (COD)</option>
+                    </select>
+                  </div>
+
+                  <div class="delivery-address-box">
+                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Delivery Address</div>
+                    <div id="shopperDeliveryAddressPreview" style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                      Dept of CSE, Block A, Visakhapatnam
+                    </div>
+                  </div>
+
+                  <button class="btn btn-primary" id="btnShopperPlaceOrder" style="width: 100%; margin-top: 14px; padding: 12px; font-weight: 600;" onclick="submitShopperOrder()" disabled>
+                    Place Order (ACID Protected)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- PRODUCT MODAL (Add/Edit) -->
+  <div id="productModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="productModalTitle">Add Product</h3>
+        <button class="modal-close-btn" onclick="closeProductModal()">✕</button>
+      </div>
+      <form id="productForm" onsubmit="handleProductSubmit(event)">
+        <input type="hidden" id="productId" />
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="productName">Product Name <span class="required">*</span></label>
+            <input type="text" id="productName" class="form-control" required placeholder="e.g. Wireless Noise-Cancelling Headphones" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="productCategory">Category <span class="required">*</span></label>
+            <select id="productCategory" class="form-control" required>
+              <option value="">-- Select Category --</option>
+            </select>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="productPrice">Price (₹) <span class="required">*</span></label>
+              <input type="number" id="productPrice" class="form-control" required min="0.01" step="0.01" placeholder="e.g. 1499.00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="productStock">Stock Quantity <span class="required">*</span></label>
+              <input type="number" id="productStock" class="form-control" required min="0" step="1" placeholder="e.g. 100" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+          <button type="submit" id="saveProductBtn" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CUSTOMER MODAL (Add/Edit) -->
+  <div id="customerModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="customerModalTitle">Add Customer</h3>
+        <button class="modal-close-btn" onclick="closeCustomerModal()">✕</button>
+      </div>
+      <form id="customerForm" onsubmit="handleCustomerSubmit(event)">
+        <input type="hidden" id="customerId" />
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="customerName">Full Name <span class="required">*</span></label>
+            <input type="text" id="customerName" class="form-control" required placeholder="e.g. Rahul Sharma" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="customerEmail">Email Address <span class="required">*</span></label>
+            <input type="email" id="customerEmail" class="form-control" required placeholder="e.g. rahul@example.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="customerPhone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="customerPhone" class="form-control" required placeholder="e.g. +91 9876543210" />
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="customerAddress">Address <span class="required">*</span></label>
+              <input type="text" id="customerAddress" class="form-control" required placeholder="e.g. 42 MG Road" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="customerCity">City <span class="required">*</span></label>
+              <input type="text" id="customerCity" class="form-control" required placeholder="e.g. Bengaluru" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Cancel</button>
+          <button type="submit" id="saveCustomerBtn" class="btn btn-primary">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ORDER DETAILS MODAL / SIDE PANEL -->
+  <div id="orderDetailsModal" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="orderDetailsTitle">Order Details</h3>
+        <button class="modal-close-btn" onclick="closeOrderDetailsModal()">✕</button>
+      </div>
+      <div class="modal-body" id="orderDetailsBody">
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <span>Loading order details...</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeOrderDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL (Generic Delete) -->
+  <div id="confirmModal" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirmModalTitle">Confirm Action</h3>
+        <button class="modal-close-btn" onclick="closeConfirmModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmModalMessage" style="font-size: 14px; color: var(--text-secondary);"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button type="button" id="confirmActionBtn" class="btn btn-danger">Confirm Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER LOGIN & PROFILE SWITCH MODAL -->
+  <div id="userLoginModal" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">User Log In & Profile Switch</h3>
+        <button class="modal-close-btn" onclick="closeLoginModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Select a project team member or enter custom credentials to switch the active operator session. All actions will be attributed to this user in the audit log.
+        </p>
+
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; display: block;">Quick Select Team Member</label>
+        <div class="team-quick-select-list">
+          <div class="team-user-item active" id="teamUserMA" onclick="selectTeamLogin('Manepalli Abhishek', '25B11CS561', 'System Administrator')">
+            <div class="team-user-avatar">MA</div>
+            <div class="team-user-info">
+              <div class="team-user-name">Manepalli Abhishek</div>
+              <div class="team-user-meta">Roll: 25B11CS561 • Lead Administrator</div>
+            </div>
+            <span class="user-check-icon">✓</span>
+          </div>
+
+          <div class="team-user-item" id="teamUserGG" onclick="selectTeamLogin('Guru kiran Gowda', '25B11CS329', 'Inventory Manager')">
+            <div class="team-user-avatar">GG</div>
+            <div class="team-user-info">
+              <div class="team-user-name">Guru kiran Gowda</div>
+              <div class="team-user-meta">Roll: 25B11CS329 • Inventory Manager</div>
+            </div>
+            <span class="user-check-icon">✓</span>
+          </div>
+
+          <div class="team-user-item" id="teamUserUD" onclick="selectTeamLogin('Upparapalli Devi Sri', '25B11CS971', 'Sales Coordinator')">
+            <div class="team-user-avatar">UD</div>
+            <div class="team-user-info">
+              <div class="team-user-name">Upparapalli Devi Sri</div>
+              <div class="team-user-meta">Roll: 25B11CS971 • Sales Coordinator</div>
+            </div>
+            <span class="user-check-icon">✓</span>
+          </div>
+
+          <div class="team-user-item" id="teamUserKH" onclick="selectTeamLogin('Kandipilli Hema Sankara VaraPrasad', '25B11CS395', 'Database Administrator')">
+            <div class="team-user-avatar">KH</div>
+            <div class="team-user-info">
+              <div class="team-user-name">Kandipilli Hema Sankara VaraPrasad</div>
+              <div class="team-user-meta">Roll: 25B11CS395 • Database Admin</div>
+            </div>
+            <span class="user-check-icon">✓</span>
+          </div>
+        </div>
+
+        <div style="margin: 18px 0; display: flex; align-items: center; gap: 12px;">
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+          <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Or Custom Login</span>
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        </div>
+
+        <form id="customLoginForm" onsubmit="handleCustomLogin(event)">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="loginCustomName">Full Name / Operator ID <span class="required">*</span></label>
+            <input type="text" id="loginCustomName" class="form-control" placeholder="e.g. Dr. Rajesh Kumar" required />
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="loginCustomRole">Assigned Role</label>
+            <select id="loginCustomRole" class="select-control" style="width: 100%;">
+              <option value="System Administrator">System Administrator</option>
+              <option value="Store Manager">Store Manager</option>
+              <option value="Viva Evaluator">Viva Evaluator</option>
+              <option value="Database Operator">Database Operator</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="loginCustomPassword">Password / PIN (optional for project evaluation)</label>
+            <input type="password" id="loginCustomPassword" class="form-control" placeholder="••••••••" />
+          </div>
+          <div class="modal-footer" style="padding: 0; margin-top: 16px;">
+            <button type="button" class="btn btn-secondary" onclick="closeLoginModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Authenticate & Log In</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTI-USER ACCESS & SWITCHER MODAL -->
+  <div id="multiUserSwitchModal" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Multi-User Access &amp; Profile Directory</h3>
+        <button class="modal-close-btn" onclick="closeMultiUserSwitchModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Select any registered user to switch to their isolated dashboard session. Their personal orders, live tracking status, and shopping cart will be loaded instantly.
+        </p>
+
+        <div class="search-input-box" style="margin-bottom: 14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="multiUserModalSearch" class="input-text" placeholder="Filter users by name, roll no, city..." oninput="filterMultiUserModalList()" />
+        </div>
+
+        <div id="multiUserModalList" style="max-height: 320px; overflow-y: auto; padding-right: 4px;">
+          <!-- Dynamically populated user list -->
+        </div>
+
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--text-muted);">Need a fresh account?</span>
+          <button class="btn btn-primary btn-sm" onclick="closeMultiUserSwitchModal(); openRegisterShopperModal();">
+            + Register New Shopper
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeMultiUserSwitchModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER NEW SHOPPER ACCOUNT MODAL -->
+  <div id="registerShopperModal" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Create New Shopper Account</h3>
+        <button class="modal-close-btn" onclick="closeRegisterShopperModal()">✕</button>
+      </div>
+      <form id="registerShopperForm" onsubmit="handleRegisterShopperSubmit(event)">
+        <div class="modal-body">
+          <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+            Register a new customer account to access the User Dashboard for placing and tracking orders.
+          </p>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="regShopperName">Full Name <span class="required">*</span></label>
+            <input type="text" id="regShopperName" class="form-control" required placeholder="e.g. Dr. Rajesh Kumar / Evaluation User" />
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="regShopperEmail">Email Address <span class="required">*</span></label>
+            <input type="email" id="regShopperEmail" class="form-control" required placeholder="e.g. rajesh@college.edu" />
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="regShopperPhone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="regShopperPhone" class="form-control" required placeholder="e.g. +91 9876543210" />
+          </div>
+          <div class="form-grid-2" style="margin-bottom: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="regShopperAddress">Delivery Address <span class="required">*</span></label>
+              <input type="text" id="regShopperAddress" class="form-control" required placeholder="e.g. Room 204, CSE Lab Block" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regShopperCity">City <span class="required">*</span></label>
+              <input type="text" id="regShopperCity" class="form-control" required placeholder="e.g. Visakhapatnam" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRegisterShopperModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitRegisterShopper">Create Account &amp; Log In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Application Logic (Vanilla JS) -->
+  <script src="app.js"></script>
+</body>
+</html>

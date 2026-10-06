@@ -1,0 +1,6 @@
+{
+  "name": "Online Shopping System Admin Dashboard",
+  "description": "Modern responsive admin dashboard and Oracle 23ai Flask REST API for an Online Shopping System with real-time stats, order transactions, inventory tracking, and payment management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
